@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>('')</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+    display: flex;
+    inline-size: 100%;
+    block-size: 100%;
+    flex-direction: column;
+}
+
+body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#mochi {
+    display: block;
+    font-family: monospace;
+    font-size: 2.7vw;
+    text-align: center;
+    white-space: pre;
+    margin: 0;
+    padding: 0;
+    border: none;
+    inline-size: 100%;
+    overflow: auto;
+}
+
+</style>
+</head>
+<body>
+<div id="mochi"></div>
+<script>
+const mochi = document.getElementById('mochi');
+const min_padding = 0;
+const max_padding = 16;
+let left_padding = 0;
+let right_padding = 0;
+
+const rand = () => {
+    const buffer = new Uint8Array(1);
+    window.crypto.getRandomValues(buffer);
+    return buffer[0] & 3;
+};
+
+const step = (current, min, max) => {
+    current = current | 0;
+    min = min | 0;
+    max = max | 0;
+    if (min > max) {
+        const temp = min;
+        min = max;
+        max = temp;
+    }
+    if (current < min) {
+        return min;
+    }
+    if (current > max) {
+        return max;
+    }
+    let d_max = 1;
+    let d_min = -1;
+    if (current < min + 1) {
+        d_min = 0;
+    }
+    if (current > max - 1) {
+        d_max = 0;
+    }
+    if (d_min == d_max) {
+        return current;
+    }
+    const range = d_max - d_min;
+    if (range == 1) {
+        const delta = d_min + (1 & rand());
+        return current + delta;
+    }
+    let delta;
+    do {
+        delta = d_min + rand();
+    } while (delta > d_max);
+    return current + delta;
+};
+
+const render = () => {
+    const left = ' '.repeat(left_padding);
+    const right = ' '.repeat(right_padding);
+    mochi.textContent = `(${left}''${right})`;
+};
+
+setInterval(() => {
+    left_padding = step(left_padding, min_padding, max_padding);
+    right_padding = step(right_padding, min_padding, max_padding);
+    render();
+}, 1000);
+
+render();
+
+</script>
+</body>
+</html>
